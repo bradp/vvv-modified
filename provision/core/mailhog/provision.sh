@@ -46,10 +46,10 @@ function mailhog_setup() {
   # Start on reboot
   if [ "${VVV_DOCKER}" != 1 ]; then
     vvv_info " * Enabling MailHog Service"
-    systemctl enable mailhog
+    systemctl enable mailhog 1> /dev/null
 
     vvv_info " * Starting MailHog Service"
-    systemctl start mailhog
+    systemctl start mailhog 1> /dev/null
   fi
 }
 export -f mailhog_setup

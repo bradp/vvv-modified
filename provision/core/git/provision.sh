@@ -7,7 +7,7 @@ function git_register_packages() {
   if ! vvv_src_list_has "git-core/ppa"; then
     # Add ppa repo.
     vvv_info " * Adding ppa:git-core/ppa repository"
-    add-apt-repository -y ppa:git-core/ppa
+    add-apt-repository -y ppa:git-core/ppa 1> /dev/null
     vvv_success " * git-core/ppa added"
   else
     vvv_info " * git-core/ppa already present, skipping"
@@ -16,7 +16,7 @@ function git_register_packages() {
   if ! vvv_apt_keys_has 'git-lfs'; then
     # Apply the PackageCloud signing key which signs git lfs
     vvv_info " * Applying the PackageCloud Git-LFS signing key..."
-    apt-key add /srv/provision/core/git/apt-keys/git-lfs.key
+    apt-key add /srv/provision/core/git/apt-keys/git-lfs.key 1> /dev/null
   fi
 
   local OSID=$(lsb_release --id --short)

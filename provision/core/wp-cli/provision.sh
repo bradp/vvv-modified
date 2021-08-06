@@ -32,7 +32,7 @@ function wp_cli_setup() {
     chown vagrant /usr/local/bin/wp
     chmod +x /usr/local/bin/wp
     vvv_info " * Updating wp-cli..."
-    noroot wp cli update --nightly --yes
+    noroot wp cli update --nightly --yes 1> /dev/null
     vvv_success " * WP CLI Nightly updated"
   fi
 
@@ -45,7 +45,7 @@ function wp_cli_setup() {
     xdebug_off
 
     vvv_info " * Updating WP packages"
-    noroot wp package update
+    noroot wp package update 1> /dev/null
     vvv_info " * WP package updates completed"
   fi
 }

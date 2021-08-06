@@ -14,7 +14,7 @@ vvv_add_hook before_packages vvv_memcached_register_packages
 
 function vvv_memcached_setup() {
   # Copy memcached configuration from local
-  vvv_info " * Copying /srv/provision/core/memcached/config/memcached.conf to /etc/memcached.conf and /etc/memcached_default.conf"
+  vvv_info " * Copying /srv/provision/core/memcached/config/memcached.conf"
   cp -f "/srv/provision/core/memcached/config/memcached.conf" "/etc/memcached.conf"
   cp -f "/srv/provision/core/memcached/config/memcached.conf" "/etc/memcached_default.conf"
 }

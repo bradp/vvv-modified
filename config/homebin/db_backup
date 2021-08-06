@@ -20,12 +20,11 @@ mysql --user="root" --password="root" -e 'show databases' | \
 grep -v -F "Database" > $TMPFIFODIR/dbnames &
 while read db_name
 do
-    # skip these databases
-    [ "${db_name}" == "mysql" ] && vvv_info "   - skipped <b>${db_name}</b>" && continue;
-    [ "${db_name}" == "information_schema" ] && vvv_info "   - skipped <b>${db_name}</b>" && continue;
-    [ "${db_name}" == "performance_schema" ] && vvv_info "   - skipped <b>${db_name}</b>" && continue;
-    [ "${db_name}" == "test" ] && vvv_info "   - skipped ${db_name}" && continue;
-    [ "${db_name}" == "wordpress_unit_tests" ] && vvv_info "   - skipped <b>${db_name}</b>" && continue;
+    [ "${db_name}" == "test" ] && continue
+    [ "${db_name}" == "mysql" ] && continue
+    [ "${db_name}" == "information_schema" ] && continue
+    [ "${db_name}" == "performance_schema" ] && continue
+    [ "${db_name}" == "wordpress_unit_tests" ] && continue
 
     skip="false"
     for exclude in ${exclude_list[@]}; do
@@ -35,7 +34,7 @@ do
     done
 
     if [ ${skip} == "true" ]; then
-        vvv_info "   - skipped <b>${db_name}</b>" && continue;
+        continue
     fi
 
     # don't back up databases with no tables
@@ -43,7 +42,7 @@ do
     db_exist=$(mysql -u root -proot --skip-column-names -e "${mysql_cmd}")
     if [ "$?" == "0" ]; then
         if [ "" == "${db_exist}" ]; then
-            vvv_info "   - skipped <b>${db_name}</b><info>, no tables in database to back up</info>" && continue;
+            continue
         fi
     fi
     databases+=( "${db_name}" )
@@ -56,7 +55,7 @@ fi
 count=0
 for db in "${databases[@]}"
 do
-    OUTPUT=$(printf "<info>   - %2s/%s Backing up </info><b>%-23s</b><info> to </info><b>'database/backups/%s${ext}'</b>" "${count}" "${#databases[@]}" "'${db}'" "${db}")
+    OUTPUT=$(printf "<info>  - Backing up </info><b>%s</b>" "${db}")
     vvv_output "${OUTPUT}"
     if [[ "${gzip}" == "True" ]]; then
       mysqldump -uroot -proot "${db}" | gzip > "/srv/database/backups/${db}.sql.gz"

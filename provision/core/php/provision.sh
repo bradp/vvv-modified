@@ -18,7 +18,7 @@ function php_register_packages() {
   if ! vvv_apt_keys_has 'Ondřej'; then
     # Apply the PHP signing key
     vvv_info " * Applying the Ondřej PHP signing key..."
-    apt-key add /srv/provision/core/php/apt-keys/ondrej_keyserver_ubuntu.key
+    apt-key add /srv/provision/core/php/apt-keys/ondrej_keyserver_ubuntu.key 1> /dev/null
   fi
 
   VVV_PACKAGE_LIST+=(
@@ -104,12 +104,12 @@ vvv_add_hook after_packages phpfpm_setup 50
 function phpfpm_finalize() {
   # Disable PHP Xdebug module by default
   vvv_info " * Disabling XDebug PHP extension"
-  phpdismod xdebug
-  phpdismod pcov
+  phpdismod xdebug > /dev/null 2>&1
+  phpdismod pcov > /dev/null 2>&1
 
   # Add the vagrant user to the www-data group so that it has better access
   # to PHP and Nginx related files.
-  usermod -a -G www-data vagrant
+  usermod -a -G www-data vagrant 1> /dev/null
 
   vvv_hook php_finalize
 }

@@ -35,7 +35,7 @@ then
 fi
 
 # Move into the newly mapped backups directory, where mysqldump(ed) SQL files are stored
-vvv_info " * Starting MariaDB Database Import"
+vvv_info " * Starting MySQL Database Import"
 # create the backup folder if it doesn't exist
 mkdir -p /srv/database/backups
 cd /srv/database/backups/
@@ -91,7 +91,7 @@ then
 				fi
 				vvv_success " * Import of <b>'${db_name}'</b><success> successful</success>"
 			else
-				vvv_info " * Skipped import of <b>\`${db_name}\`</b><info> - tables already exist"
+				vvv_info " - Skipped import of <b>\`${db_name}\`</b><info> - tables already exist"
 			fi
 		fi
 	done

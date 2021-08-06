@@ -17,16 +17,16 @@ function mariadb_register_packages() {
     vvv_info " * mysql group exists"
   else
     echo " * creating mysql group"
-    groupadd -g 9001 mysql
+    groupadd -g 9001 mysql 1> /dev/null
   fi
 
   if id -u mysql >/dev/null 2>&1; then
     vvv_info " * mysql user present and has uid $(id -u mysql)"
   else
     vvv_info " * adding the mysql user"
-    useradd -u 9001 -g mysql -r mysql
+    useradd -u 9001 -g mysql -r mysql 1> /dev/null
     if grep -q vboxsf /etc/group; then
-      usermod -G vboxsf mysql
+      usermod -G vboxsf mysql 1> /dev/null
     fi
   fi
 
@@ -37,7 +37,7 @@ function mariadb_register_packages() {
   if ! vvv_apt_keys_has 'MariaDB'; then
     # Apply the MariaDB signing keyg
     vvv_info " * Applying the MariaDB signing key..."
-    apt-key add /srv/provision/core/mariadb/apt-keys/mariadb.key
+    apt-key add /srv/provision/core/mariadb/apt-keys/mariadb.key 1> /dev/null
   fi
 
   local OSID=$(lsb_release --id --short)
@@ -94,11 +94,11 @@ function mysql_setup() {
 
   # Copy mysql configuration from local
   cp -f "/srv/provision/core/mariadb/config/my.cnf" "/etc/mysql/my.cnf"
-  vvv_info " * Copied /srv/provision/core/mariadb/config/my.cnf               to /etc/mysql/my.cnf"
+  vvv_info " * Copied /srv/provision/core/mariadb/config/my.cnf to /etc/mysql/my.cnf"
 
   cp -f  "/srv/provision/core/mariadb/config/root-my.cnf" "/home/vagrant/.my.cnf"
   chmod 0644 "/home/vagrant/.my.cnf"
-  vvv_info " * Copied /srv/provision/core/mariadb/config/root-my.cnf          to /home/vagrant/.my.cnf"
+  vvv_info " * Copied /srv/provision/core/mariadb/config/root-my.cnf to /home/vagrant/.my.cnf"
 
   if [ "${VVV_DOCKER}" != 1 ]; then
     check_mysql_root_password
@@ -109,10 +109,10 @@ function mysql_setup() {
   # deciding whether to start or restart.
   if [ $(service mysql status|grep 'mysql start/running' | wc -l) -ne 1 ]; then
     vvv_info " * Starting the mysql service"
-    service mysql start
+    service mysql start 1> /dev/null
   else
     vvv_info " * Restarting mysql service"
-    service mysql restart
+    service mysql restart 1> /dev/null
   fi
 
   # IMPORT SQL
@@ -121,7 +121,7 @@ function mysql_setup() {
   # the mysqldump files located in database/backups/
   if [[ -f "/srv/database/init-custom.sql" ]]; then
     vvv_info " * Running custom init-custom.sql under the root user..."
-    mysql -u "root" -p"root" < "/srv/database/init-custom.sql"
+    mysql -u "root" -p"root" < "/srv/database/init-custom.sql" 1> /dev/null
     vvv_success " * init-custom.sql has run"
   else
     vvv_info " * No custom MySQL scripting found in database/init-custom.sql, skipping..."
@@ -129,7 +129,7 @@ function mysql_setup() {
 
   # Setup MySQL by importing an init file that creates necessary
   # users and databases that our vagrant setup relies on.
-  mysql -u "root" -p"root" < "/srv/database/init.sql"
+  mysql -u "root" -p"root" < "/srv/database/init.sql" 1> /dev/null
   vvv_info " * Initial SQL prep..."
 
   # Process each mysqldump SQL file in database/backups to import

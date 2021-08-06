@@ -31,7 +31,6 @@ if [[ $PATH != *"/srv/www/phpcs/scripts"* ]]; then
 	export PATH="$PATH:/srv/www/phpcs/scripts"
 fi
 
-
 # Ruby Gems
 if [ -d "$HOME/.gem/bin" ] ; then
   if [[ $PATH != *"${HOME}/.gem/bin"* ]]; then
@@ -51,3 +50,6 @@ if [ -n "$BASH" ]; then
 	# add autocomplete for wp-cli
 	[ -s "/srv/config/wp-cli/wp-completion.bash" ] && . /srv/config/wp-cli/wp-completion.bash
 fi
+
+
+alias "x"="ls -las"

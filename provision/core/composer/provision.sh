@@ -35,21 +35,12 @@ function composer_setup() {
     rm /srv/provision/github.token
     echo "$github_token" >> /srv/provision/github.token
     ghtoken=$(cat /srv/provision/github.token)
-    noroot composer config --global github-oauth.github.com "$ghtoken"
+    noroot composer config --global -q github-oauth.github.com "$ghtoken"
     vvv_success " * Your personal GitHub token is set for Composer."
   fi
 
   # Update both Composer and any global packages. Updates to Composer are direct from
   # the master branch on its GitHub repository.
-  vvv_info " * Checking for Composer updates"
-  if ! noroot composer --version --no-ansi | grep 'Composer version'; then
-    vvv_info " * Updating Composer..."
-    COMPOSER_HOME="${COMPOSER_DATA_DIR}" noroot composer --no-ansi global config bin-dir /usr/local/bin
-    COMPOSER_HOME="${COMPOSER_DATA_DIR}" noroot composer --no-ansi self-update --2 --stable --no-progress --no-interaction
-    vvv_info " * Making sure the PHPUnit 7.5 package is available..."
-    COMPOSER_HOME="${COMPOSER_DATA_DIR}" noroot composer --no-ansi global require --prefer-dist --no-update --no-progress --no-interaction phpunit/phpunit:^7.5
-  fi
-
   if [ -f "${COMPOSER_DATA_DIR}"/composer.json ]; then
     vvv_info " * Updating global Composer packages..."
     COMPOSER_HOME="${COMPOSER_DATA_DIR}" noroot composer --no-ansi global update --no-progress --no-interaction

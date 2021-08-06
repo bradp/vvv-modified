@@ -20,7 +20,7 @@ rm -f /vagrant/config.yml
 
 if [ -x "$(command -v ntpdate)" ]; then
 	echo " * Syncing clocks"
-	sudo ntpdate -u ntp.ubuntu.com
+	sudo ntpdate -u ntp.ubuntu.com 1> /dev/null
 else
 	echo " - skipping ntpdate clock sync, not installed yet"
 fi
@@ -79,14 +79,14 @@ vvv_hook before_packages
 vvv_info " * Main packages check and install."
 vvv_info " * Checking for apt packages to remove."
 if ! vvv_apt_package_remove ${VVV_PACKAGE_REMOVAL_LIST[@]}; then
-  vvv_error " ! Main packages removal failed, halting provision"
+  vvv_error " * Main packages removal failed, halting provision"
   exit 1
 fi
 vvv_info " * Upgrading apt packages."
 vvv_apt_packages_upgrade
 vvv_info " * Checking for apt packages to install."
 if ! vvv_package_install ${VVV_PACKAGE_LIST[@]}; then
-  vvv_error " ! Main packages check and install failed, halting provision"
+  vvv_error " * Main packages check and install failed, halting provision"
   exit 1
 fi
 

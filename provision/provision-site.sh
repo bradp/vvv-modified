@@ -132,7 +132,7 @@ function vvv_provision_hosts_file() {
       if [[ "#" != ${line:0:1} ]]; then
         if [[ -z "$(grep -q "^127.0.0.1 ${line}$" /etc/hosts)" ]]; then
           echo "127.0.0.1 $line # vvv-auto" >> "/etc/hosts"
-          echo "   - Added ${line} from ${HOSTFILE}"
+          echo "- Added ${line} from ${HOSTFILE}"
         fi
       fi
     done < "$HOSTFILE"
@@ -162,7 +162,7 @@ function vvv_process_site_hosts() {
       echo " * Searching subfolders 4 levels down for a vvv-hosts file ( this can be skipped by using ./vvv-hosts, .vvv/vvv-hosts, or provision/vvv-hosts"
       local HOST_FILES=$(find "${VM_DIR}" -maxdepth 4 -name 'vvv-hosts');
       if [[ -z $HOST_FILES ]] ; then
-        vvv_error " ! Warning: No vvv-hosts file was found, and no hosts were defined in the vvv config, this site may be inaccessible"
+        vvv_error " * Warning: No vvv-hosts file was found, and no hosts were defined in the vvv config, this site may be inaccessible"
       else
         for HOST_FILE in $HOST_FILES; do
           vvv_provision_hosts_file "$HOST_FILE"
@@ -174,7 +174,7 @@ function vvv_process_site_hosts() {
     for line in $hosts; do
       if [[ -z "$(grep -q "^127.0.0.1 $line$" /etc/hosts)" ]]; then
         echo "127.0.0.1 ${line} # vvv-auto" >> "/etc/hosts"
-        echo "   - Added ${line} from ${VVV_CONFIG}"
+        echo "- Added ${line} from ${VVV_CONFIG}"
       fi
     done
   fi
@@ -195,45 +195,33 @@ function vvv_provision_site_repo() {
         echo " * Checking that remote origin is ${REPO}"
         CURRENTORIGIN=$(git remote get-url origin)
         if [[ "${CURRENTORIGIN}" != "${REPO}" ]]; then
-          vvv_error " ! The site config said to use <b>${REPO}</b>"
-          vvv_error " ! But the origin remote is actually <b>${CURRENTORIGIN}</b>"
-          vvv_error " ! Remove the unknown origin remote and re-add it."
-          vvv_error ""
-          vvv_error " ! You can do this by running these commands inside the VM:"
-          vvv_error " "
-          vvv_error " cd ${VM_DIR}"
-          vvv_error " git remote remove origin"
-          vvv_error " git remote add origin ${REPO}"
-          vvv_error " exit"
-          vvv_error " "
-          vvv_error " ! You can get inside the VM using <b>vagrant ssh</b>"
-          vvv_error " "
+          vvv_error " * Error getting remote."
           SUCCESS=1
           return 1
         fi
         echo " * Fetching origin ${BRANCH}"
-        noroot git fetch origin "${BRANCH}"
+        noroot git fetch origin "${BRANCH}" -q
         echo " * performing a hard reset on origin/${BRANCH}"
-        noroot git reset "origin/${BRANCH}" --hard
+        noroot git reset "origin/${BRANCH}" --hard -q
         echo " * Updating provisioner repo complete"
       else
-        vvv_error " ! Problem! A site folder for ${SITE} was found at ${VM_DIR} that doesn't use a site template, but a site template is defined in the config file. Either the config file is mistaken, or a previous attempt to provision has failed, VVV will not try to git clone the site template to avoid data destruction, either remove the folder, or fix the config/config.yml entry${CRESET}"
+        vvv_error " * Problem! A site folder for ${SITE} was found at ${VM_DIR} that doesn't use a site template, but a site template is defined in the config file. Either the config file is mistaken, or a previous attempt to provision has failed, VVV will not try to git clone the site template to avoid data destruction, either remove the folder, or fix the config/config.yml entry${CRESET}"
       fi
     else
       # Clone or pull the site repository
       vvv_info " * Downloading ${SITE} provisioner, git cloning from ${REPO} into ${VM_DIR}"
-      if noroot git clone --recursive --branch "${BRANCH}" "${REPO}" "${VM_DIR}"; then
+      if noroot git clone --recursive --branch "${BRANCH}" "${REPO}" "${VM_DIR}" -q; then
         vvv_success " * ${SITE} provisioner clone successful"
       else
-        vvv_error " ! Git failed to clone the site template for ${SITE}. It tried to clone the ${BRANCH} of ${REPO} into ${VM_DIR}${CRESET}"
-        vvv_error " ! VVV won't be able to provision ${SITE} without the template. Check that you have permission to access the repo, and that the filesystem is writable${CRESET}"
+        vvv_error " * Git failed to clone the site template for ${SITE}. It tried to clone the ${BRANCH} of ${REPO} into ${VM_DIR}${CRESET}"
+        vvv_error " * VVV won't be able to provision ${SITE} without the template. Check that you have permission to access the repo, and that the filesystem is writable${CRESET}"
         exit 1
       fi
     fi
   else
     vvv_info " * The site: '${SITE}' does not have a site template, assuming custom provision/vvv-init.sh and provision/vvv-nginx.conf"
     if [[ ! -d "${VM_DIR}" ]]; then
-      vvv_error " ! Error: The '${SITE}' has no folder, VVV does not create the folder for you, or set up the Nginx configs. Use a site template or create the folder and provisioner files, then reprovision VVV"
+      vvv_error " * The '${SITE}' has no folder, VVV does not create the folder for you, or set up the Nginx configs. Use a site template or create the folder and provisioner files, then reprovision VVV"
       exit 1
     fi
   fi
@@ -251,7 +239,7 @@ function vvv_run_site_template_script() {
     vvv_info " * sourcing of ${1} reported success"
     return 0
   else
-    vvv_error " ! sourcing of ${1} reported failure with an error code of ${?}"
+    vvv_error " * sourcing of ${1} reported failure with an error code of ${?}"
     return 1
   fi
 }
@@ -273,10 +261,10 @@ function vvv_provision_site_script() {
     vvv_run_site_template_script "vvv-init.sh" "${VM_DIR}"
     SUCCESS=$?
   else
-    vvv_warn " * Warning: A site provisioner was not found at .vvv/vvv-init.sh provision/vvv-init.sh or vvv-init.sh, searching 3 folders down, please be patient..."
+    vvv_warn " * A site provisioner was not found at .vvv/vvv-init.sh provision/vvv-init.sh or vvv-init.sh, searching 3 folders down, please be patient..."
     local SITE_INIT_SCRIPTS=$(find "${VM_DIR}" -maxdepth 3 -name 'vvv-init.sh');
     if [[ -z $SITE_INIT_SCRIPTS ]] ; then
-      vvv_warn " * Warning: No site provisioner was found, VVV could not perform any scripted setup that might install software for this site"
+      vvv_warn " * No site provisioner was found, VVV could not perform any scripted setup that might install software for this site"
     else
       for SITE_INIT_SCRIPT in $SITE_INIT_SCRIPTS; do
         local DIR="$(dirname "$SITE_INIT_SCRIPT")"
@@ -299,15 +287,10 @@ function vvv_provision_site_nginx() {
   elif [[ -f "${VM_DIR}/vvv-nginx.conf" ]]; then
     vvv_provision_site_nginx_config "${SITE}" "${VM_DIR}/vvv-nginx.conf"
   else
-    vvv_warn " ! Warning: An nginx config was not found!! VVV needs an Nginx config for the site or it will not know how to serve it."
-    vvv_warn " * VVV searched for an Nginx config in these locations:"
-    vvv_warn "   - ${VM_DIR}/.vvv/vvv-nginx.conf"
-    vvv_warn "   - ${VM_DIR}/provision/vvv-nginx.conf"
-    vvv_warn "   - ${VM_DIR}/vvv-nginx.conf"
-    vvv_warn " * VVV will search 3 folders down to find an Nginx config, please be patient..."
+    vvv_warn " * An nginx config was not found!! VVV needs an Nginx config for the site or it will not know how to serve it."
     local NGINX_CONFIGS=$(find "${VM_DIR}" -maxdepth 3 -name 'vvv-nginx.conf');
     if [[ -z $NGINX_CONFIGS ]] ; then
-      vvv_error " ! Error: No nginx config was found, VVV will not know how to serve this site"
+      vvv_error " * No nginx config was found, VVV will not know how to serve this site"
       exit 1
     else
       vvv_warn " * VVV found Nginx config files in subfolders, move these files to the expected locations to avoid these warnings."
@@ -421,13 +404,11 @@ function vvv_custom_folder_git() {
   else
     if [[ $overwrite_on_clone == "True" ]]; then
       if [ ! -d "${VVV_PATH_TO_SITE}/${folder}/.git" ]; then
-        vvv_info " - VVV was asked to clone into a folder that already exists (${folder}), but does not contain a git repo"
-        vvv_info " - overwrite_on_clone is turned on so VVV will purge with extreme predjudice and clone over the folders grave"
         rm -rf "${VVV_PATH_TO_SITE}/${folder}"
         vvv_clone_site_git_folder "${repo}" "${folder}"
       fi
     else
-      vvv_warn " - Cannot clone into <b>'${folder}'</b><warn>, a folder that is not a git repo already exists. Set overwrite: true to force the folders deletion and a clone will take place"
+      vvv_warn " * Cannot clone into <b>'${folder}'</b><warn>, a folder that is not a git repo already exists. Set overwrite: true to force the folders deletion and a clone will take place"
     fi
   fi
 
@@ -484,9 +465,7 @@ vvv_provision_site_repo
 if [[ ! -d "${VM_DIR}" ]]; then
   vvv_error " "
   vvv_error " "
-  vvv_error " ! Error: The <b>${VM_DIR}</b><error> folder does not exist, there is nothing to provision for the <b>'${SITE}'</b><error> site!</error>"
-  vvv_error " ! It is not enough to declare a site, if you do not specify a provisioner repo/site template then you have to create the folder and fill it yourself."
-  vvv_error " ! At a very minimum, VVV needs an Nginx config so it knows how to serve the website"
+  vvv_error " * Error: The <b>${VM_DIR}</b><error> folder does not exist, there is nothing to provision for the <b>'${SITE}'</b><error> site!</error>"
   vvv_error " "
   vvv_error " "
   exit 1
@@ -501,7 +480,7 @@ vvv_info " * Reloading Nginx"
 service nginx reload
 
 if [ "${SUCCESS}" -ne "0" ]; then
-  vvv_error " ! ${SITE} provisioning had some issues, check the log files as the site may not function correctly."
+  vvv_error " * ${SITE} provisioning had some issues, check the log files as the site may not function correctly."
   exit 1
 fi
 

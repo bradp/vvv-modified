@@ -71,19 +71,19 @@ function profile_setup() {
   chown -R vagrant:vagrant /home/vagrant/
 
   # Copy custom dotfiles and bin file for the vagrant user from local
-  vvv_info " * Copying /srv/provision/core/env/homedir/.bash_profile                      to /home/vagrant/.bash_profile"
+  vvv_info " * Copying /srv/provision/core/env/homedir/.bash_profile to /home/vagrant/.bash_profile"
   rm -f "/home/vagrant/.bash_profile"
   noroot cp -f "/srv/provision/core/env/homedir/.bash_profile" "/home/vagrant/.bash_profile"
 
-  vvv_info " * Copying /srv/provision/core/env/homedir/.bash_aliases                      to /home/vagrant/.bash_aliases"
+  vvv_info " * Copying /srv/provision/core/env/homedir/.bash_aliases to /home/vagrant/.bash_aliases"
   rm -f "/home/vagrant/.bash_aliases"
   noroot cp -f "/srv/provision/core/env/homedir/.bash_aliases" "/home/vagrant/.bash_aliases"
 
-  vvv_info " * Copying /srv/provision/core/env/homedir/.bash_aliases                      to ${HOME}/.bash_aliases"
+  vvv_info " * Copying /srv/provision/core/env/homedir/.bash_aliases to ${HOME}/.bash_aliases"
   rm -f "${HOME}/.bash_aliases"
   cp -f "/srv/provision/core/env/homedir/.bash_aliases" "${HOME}/.bash_aliases"
 
-  vvv_info " * Copying /srv/provision/core/env/homedir/.vimrc                             to /home/vagrant/.vimrc"
+  vvv_info " * Copying /srv/provision/core/env/homedir/.vimrc to /home/vagrant/.vimrc"
   rm -f "/home/vagrant/.vimrc"
   noroot cp -f "/srv/provision/core/env/homedir/.vimrc" "/home/vagrant/.vimrc"
 
@@ -91,11 +91,11 @@ function profile_setup() {
     noroot mkdir -p "/home/vagrant/.subversion"
   fi
 
-  vvv_info " * Copying /srv/provision/core/env/homedir/.subversion/subversion-servers                to /home/vagrant/.subversion/servers"
+  vvv_info " * Copying /srv/provision/core/env/homedir/.subversion/subversion-servers"
   rm -f /home/vagrant/.subversion/servers
   noroot cp "/srv/provision/core/env/homedir/.subversion/subversion-servers" "/home/vagrant/.subversion/servers"
 
-  vvv_info " * Copying /srv/provision/core/env/homedir/.subversion/subversion-config                 to /home/vagrant/.subversion/config"
+  vvv_info " * Copying /srv/provision/core/env/homedir/.subversion/subversion-config"
   rm -f /home/vagrant/.subversion/config
   noroot cp "/srv/provision/core/env/homedir/.subversion/subversion-config" "/home/vagrant/.subversion/config"
 
@@ -107,13 +107,13 @@ function profile_setup() {
   fi
 
   if [ -d "/etc/ssh" ]; then
-    vvv_info " * Copying /srv/provision/core/env/ssh/ssh_known_hosts                   to /etc/ssh/ssh_known_hosts"
+    vvv_info " * Copying /srv/provision/core/env/ssh/ssh_known_hosts to /etc/ssh/ssh_known_hosts"
     cp -f /srv/provision/core/env/ssh/ssh_known_hosts /etc/ssh/ssh_known_hosts
-    vvv_info " * Copying /srv/provision/core/env/ssh/sshd_config                       to /etc/ssh/sshd_config"
+    vvv_info " * Copying /srv/provision/core/env/ssh/sshd_config to /etc/ssh/sshd_config"
     cp -f /srv/provision/core/env/ssh/sshd_config /etc/ssh/sshd_config
     if [ "${VVV_DOCKER}" != 1 ]; then
       vvv_info " * Reloading SSH Daemon"
-      systemctl reload ssh
+      systemctl reload ssh 1> /dev/null
     fi
   fi
 }

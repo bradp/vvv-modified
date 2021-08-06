@@ -15,7 +15,7 @@ function vvv_register_packages() {
   if ! vvv_apt_keys_has 'Varying Vagrant Vagrants'; then
     # Apply the VVV signing key
     vvv_info " * Applying the Varying Vagrant Vagrants mirror signing key..."
-    apt-key add /srv/provision/core/vvv/apt-keys/varying-vagrant-vagrants_keyserver_ubuntu.key
+    apt-key add /srv/provision/core/vvv/apt-keys/varying-vagrant-vagrants_keyserver_ubuntu.key 1> /dev/null
   fi
 
   VVV_PACKAGE_REMOVAL_LIST+=(
@@ -68,8 +68,8 @@ function shyaml_setup() {
   # Used for passing custom parameters to the bash provisioning scripts
   if [ ! -f /usr/local/bin/shyaml ]; then
     vvv_info " * Installing Shyaml for bash provisioning.."
-    sudo pip3 install wheel
-    sudo pip3 install shyaml
+    sudo pip3 install wheel 1> /dev/null
+    sudo pip3 install shyaml 1> /dev/null
   fi
 }
 export -f shyaml_setup

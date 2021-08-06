@@ -17,7 +17,6 @@ export BLUE="\033[0;38;5;4m" # 33m"
 export PURPLE="\033[0;38;5;5m" # 129m"
 export CRESET="\033[0m"
 
-
 VVV_CONFIG=/vagrant/vvv-custom.yml
 if [[ -f /vagrant/config.yml ]]; then
 	VVV_CONFIG=/vagrant/config.yml
@@ -73,10 +72,9 @@ function check_network_connection_to_host() {
   # then we'll skip a few things further in provisioning rather
   # than create a bunch of errors.
   if [[ "$(wget --tries=3 --timeout=10 "${url}" -O /dev/null 2>&1 | grep 'connected')" ]]; then
-    vvv_success " * Successful Network connection to <url>${url}</url><success> detected"
     return 0
   fi
-  vvv_error " ! Network connection issues found. Unable to reach <url>${url}</url>"
+  vvv_error " * Network connection issues found. Unable to reach <url>${url}</url>"
   return 1
 }
 export -f check_network_connection_to_host
@@ -95,10 +93,6 @@ function network_check() {
     "http://ppa.launchpad.net"
     "https://wordpress.org"
     "https://github.com"
-    "https://raw.githubusercontent.com"
-    "https://getcomposer.org"
-    "http://ams2.mirrors.digitalocean.com"
-    "https://deb.nodesource.com"
   )
   declare -a failed_hosts=()
   for url in "${hosts_to_test[@]}"; do
@@ -108,11 +102,10 @@ function network_check() {
   done
 
   if (( ${#failed_hosts[@]} )); then
-    vvv_error "#################################################################"
     vvv_error " "
-    vvv_error "! Network Problem:"
+    vvv_error " * Network Problem:"
     vvv_error " "
-    vvv_error "VVV tried to ping several domains it needs but some failed:"
+    vvv_error "   VVV tried to ping several domains it needs but some failed:"
     vvv_error " "
     for i in "${hosts_to_test[@]}"; do
       local url="${i}"
@@ -122,38 +115,6 @@ function network_check() {
         echo -e "${CRESET} [${GREEN}✓${CRESET}] ${url}${RED}"
       fi
     done
-    vvv_error " "
-    vvv_error "Make sure you have a working internet connection, that you "
-    vvv_error "restarted after installing VirtualBox and Vagrant, and that "
-    vvv_error "they aren't blocked by a firewall or security software."
-    vvv_error "If you can load the address in your browser, then VVV should"
-    vvv_error "be able to connect."
-    vvv_error " "
-    vvv_error "Also note that some users have reported issues when combined"
-    vvv_error "with VPNs, disable your VPN and reprovision to see if this is"
-    vvv_error "the cause."
-    vvv_error " "
-    vvv_error "Additionally, if you're at a contributor day event, be kind,"
-    vvv_error "provisioning involves downloading things, a full provision may "
-    vvv_error "ruin the wifi for everybody else :("
-    vvv_error " "
-    if ! command -v ifconfig &> /dev/null; then
-      vvv_error "Network ifconfig output:"
-      vvv_error " "
-      ifconfig
-      vvv_error " "
-    fi
-    vvv_error "Aborting provision. "
-    vvv_error "Try provisioning again once network connectivity is restored."
-    vvv_error "If that doesn't work, and you're sure you have a strong "
-    vvv_error "internet connection, open an issue on GitHub, and include the "
-    vvv_error "output above so that the problem can be debugged"
-    vvv_error " "
-    vvv_error "vagrant reload --provision"
-    vvv_error " "
-    vvv_error "<url>https://github.com/Varying-Vagrant-Vagrants/VVV/issues</url>"
-    vvv_error " "
-    vvv_error "#################################################################"
     return 1
   fi
   vvv_success " * Network checks succeeded"
@@ -165,11 +126,8 @@ export -f network_check
 #
 # @arg $1 string name of the provisioner
 function log_to_file() {
-	local date_time=$(cat /vagrant/provisioned_at)
-	local logfolder="/var/log/provisioners/${date_time}"
-	local logfile="${logfolder}/${1}.log"
-	mkdir -p "${logfolder}"
-	touch "${logfile}"
+	local logfile="/var/log/provisioners/${1}.log"
+	echo "" > "${logfile}"
 	# reset output otherwise it will log to previous files. from backup made in provisioners.sh
 	exec 1>&6
 	exec 2>&7
@@ -247,15 +205,48 @@ function vvv_format_output() {
 }
 export -f vvv_format_output
 
+# @description Takes an input string and attempts to apply terminal formatting for various colours
+#
+# @example
+#   MSG=$(vvv_format_output "<success>green!</success>, <error>red :(</error>, <url>example.com</url></>normal text")
+#
+# @arg $1 string Text to format
+function vvv_format_log() {
+  declare -A TAGS=(
+    ['<b>']=""
+    ['</b>']=""
+    ['<info>']=""
+    ['</info>']=""
+    ['<success>']=""
+    ['</success>']=""
+    ['<warn>']=""
+    ['</warn>']=""
+    ['<error>']=""
+    ['</error>']=""
+    ['<url>']=""
+    ['</url>']=""
+    ['</>']=""
+  )
+
+  local MSG="${1}</>"
+  for TAG in "${!TAGS[@]}"; do
+    local VAL="${TAGS[$TAG]}"
+    MSG=$(echo "${MSG//"${TAG}"/"${VAL}"}" )
+  done
+  echo -e "${MSG}"
+}
+export -f vvv_format_log
+
 # @description Output to the terminal, and log to a provisioner log at the same time, with applied formatting
 #
 # @arg $1 string The message to print
 function vvv_output() {
   local MSG=$(vvv_format_output "${1}")
+  local log=$(vvv_format_log "${1}")
 	echo -e "${MSG}"
   if [[ ! -z "${VVV_LOG}" ]]; then
     if [ "${VVV_LOG}" != "main" ]; then
-      test -e /proc/$$/fd/6 && >&6 echo -e "${MSG}"
+      test -e /proc/$$/fd/6 && >&6 echo -e "${log}"
     fi
   fi
 }
@@ -273,7 +264,6 @@ export -f vvv_info
 #
 # @arg $1 string The message to print
 function vvv_error() {
-  local MSG=$(vvv_format_output )
   vvv_output "<error>${1}</error>"
 }
 export -f vvv_error
@@ -351,7 +341,7 @@ export -f get_config_keys
 # @arg $3 number the priority of the function when the hook executes, determines order, lower values execute earlier
 vvv_add_hook() {
   if [[ "${1}" =~ [^a-zA-Z_] ]]; then
-    vvv_warn "Invalid hookname '${1}', hooks must only contain the characters A-Z and a-z"
+    vvv_warn " * Invalid hookname '${1}', hooks must only contain the characters A-Z and a-z"
     return 1
   fi
 
@@ -387,7 +377,7 @@ vvv_hook() {
 
   local hook_var_prios="VVV_HOOKS_${1}"
   local start=`date +%s`
-  vvv_info " ▷ Running <b>${1}</b><info> hook"
+  vvv_info " * Running <b>${1}</b><info> hook"
   eval "if [ -z \"\${${hook_var_prios}}\" ]; then return 0; fi"
   local sorted
   eval "if [ ! -z \"\${${hook_var_prios}}\" ]; then IFS=$'\n' sorted=(\$(sort -n <<<\"\${${hook_var_prios}[*]}\")); unset IFS; fi"
@@ -398,27 +388,27 @@ vvv_hook() {
     eval "for j in \${!${hooks_on_prio}[@]}; do \${${hooks_on_prio}[\$j]}; done"
   done
   local end=`date +%s`
-  vvv_success " ✔ Finished <b>${1}</b><success> hook in </success><b>`expr $end - $start`s</b>"
+  vvv_success " * Finished <b>${1}</b><success> hook in </success><b>`expr $end - $start`s</b>"
 }
 export -f vvv_hook
 
 vvv_apt_update() {
   vvv_info " * Updating apt keys"
-  apt-key update -y
+  apt-key update -y 1> /dev/null
 
   # Update all of the package references before installing anything
   vvv_info " * Running apt-get update..."
   rm -rf /var/lib/apt/lists/*
-  apt-get update -y --fix-missing
+  apt-get -qq update -y --fix-missing 1> /dev/null
 }
 
 vvv_apt_packages_upgrade() {
   vvv_info " * Upgrading apt packages"
   vvv_apt_update
   dpkg --configure -a
-  if ! apt-get  -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew upgrade --fix-missing --no-install-recommends --fix-broken; then
+  if ! apt-get -qq -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew upgrade --fix-missing --no-install-recommends --fix-broken; then
     vvv_error " * Upgrading apt packages returned a failure code, cleaning up apt caches then exiting"
-    apt-get clean -y
+    apt-get -qq clean -y  1> /dev/null
     return 1
   fi
 }
@@ -427,11 +417,11 @@ export -f vvv_apt_packages_upgrade
 vvv_apt_cleanup() {
   # Remove unnecessary packages
   vvv_info " * Removing unnecessary apt packages..."
-  apt-get autoremove -y
+  apt-get -qq autoremove -y  1> /dev/null
 
   # Clean up apt caches
   vvv_info " * Cleaning apt caches..."
-  apt-get clean -y
+  apt-get -qq clean -y  1> /dev/null
 }
 
 # @description Installs a selection of packages via `apt`
@@ -463,9 +453,9 @@ vvv_package_install() {
 
   # To avoid issues on provisioning and failed apt installation
   dpkg --configure -a
-  if ! apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew install --fix-missing --no-install-recommends --fix-broken ${packages[@]}; then
+  if ! apt-get -y -q --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew install --fix-missing --no-install-recommends --fix-broken ${packages[@]}; then
     vvv_error " * Installing apt-get packages returned a failure code, cleaning up apt caches then exiting"
-    apt-get clean -y
+    apt-get clean -q -y 1> /dev/null
     return 1
   fi
 
@@ -530,15 +520,27 @@ vvv_apt_package_remove() {
   vvv_info " * Removing apt-get packages..."
 
   # To avoid issues on provisioning and failed apt installation
-  dpkg --configure -a
-  if ! apt-get -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew remove --fix-missing --no-install-recommends --fix-broken ${packages[@]}; then
-    vvv_error " * Removing apt-get packages returned a failure code, cleaning up apt caches then exiting"
-    apt-get clean -y
-    return 1
-  fi
+  # dpkg --configure -a
+  # if ! apt-get -y -qq --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew remove --fix-missing --no-install-recommends --fix-broken ${packages[@]}; then
+  #   vvv_error " * Removing apt-get packages returned a failure code, cleaning up apt caches then exiting"
+  #   apt-get clean -y -qq 1> /dev/null
+  #   return 1
+  # fi
 
   vvv_apt_cleanup
 
   return 0
 }
 export -f vvv_apt_package_remove
+
+show_site_urls() {
+  RED="\033[38;5;9m"
+  GREEN="\033[01;32m"
+  CRESET="\033[0m"
+
+  URL="\033[4;38;5;3m"
+
+  echo -e " "
+  echo -e "${GREEN}vvv dashboard: ${URL}http://vvv.test${CRESET}"
+  echo -e " "
+}

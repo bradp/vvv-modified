@@ -26,6 +26,8 @@ yellow="\[\033[38;5;3m\]"
 white="\[\033[00m\]"
 PS1="${debian_chroot:+($debian_chroot)}${red}\u${green}@${blue}\h${white}:${yellow}\w$ \[\033[0m\]"
 
+cd "/srv/www"
+
 # setup bash prompt
 if [ -n "$BASH_VERSION" ]; then
     # include .bash_prompt if it exists

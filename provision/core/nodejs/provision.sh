@@ -17,7 +17,7 @@ function nodejs_register_packages() {
   if ! vvv_apt_keys_has 'NodeSource'; then
     # Retrieve the NodeJS signing key from nodesource.com
     vvv_info " * Applying NodeSource NodeJS signing key..."
-    apt-key add /srv/provision/core/nodejs/apt-keys/nodesource.gpg.key
+    apt-key add /srv/provision/core/nodejs/apt-keys/nodesource.gpg.key 1> /dev/null
   fi
 
   VVV_PACKAGE_LIST+=(
@@ -30,13 +30,13 @@ vvv_add_hook before_packages nodejs_register_packages
 
 function reinstall_node() {
   vvv_info " * Purging NodeJS package."
-  apt-get purge nodejs -y
+  apt-get purge nodejs -y -q  1> /dev/null
   vvv_info " * Cleaning apt."
-  apt-get clean -y
+  apt-get clean -y -q 1> /dev/null
   vvv_info " * Apt autoremove."
-  apt-get autoremove -y
+  apt-get autoremove -y -q 1> /dev/null
   vvv_info " * Installing Node 14 LTS."
-  apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew --fix-missing --fix-broken nodejs
+  apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew --fix-missing --fix-broken nodejs -q  1> /dev/null
   vvv_success " ✓ Reinstalled Node, if you need another version use the nvm utility"
 }
 
