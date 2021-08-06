@@ -26,6 +26,10 @@ elif [ -d "/srv/www/wordpress-develop/public_html/src/" ]; then
     export WP_CORE_DIR=/srv/www/wordpress-develop/public_html/src/
 fi
 
+if [[ $PATH != *"/srv/www/phpcs/bin"* ]]; then
+	export PATH="$PATH:/srv/www/phpcs/bin"
+fi
+
 if [[ $PATH != *"/srv/www/phpcs/vendor/bin"* ]]; then
 	export PATH="$PATH:/srv/www/phpcs/vendor/bin"
 fi
