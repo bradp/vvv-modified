@@ -176,7 +176,6 @@ Vagrant.configure('2') do |config|
   config.vm.synced_folder 'config/', '/srv/config'
   config.vm.synced_folder 'provision/', '/srv/provision'
   config.vm.synced_folder 'certificates/', '/srv/certificates', create: true
-  config.vm.synced_folder 'log/memcached', '/var/log/memcached', owner: 'root', create: true, group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
   config.vm.synced_folder 'log/nginx', '/var/log/nginx', owner: 'root', create: true, group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
   config.vm.synced_folder 'log/php', '/var/log/php', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
   config.vm.synced_folder 'log/provisioners', '/var/log/provisioners', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
@@ -190,10 +189,6 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.provision 'default', type: 'shell', keep_color: true, path: File.join('provision', 'provision.sh'), env: { "VVV_LOG" => "main" }
-
-  vvv_config['utility-sources'].each do |name, args|
-    config.vm.provision "utility-source-#{name}", type: 'shell', keep_color: true, path: File.join('provision', 'provision-utility-source.sh'), args: [ name, args['repo'].to_s, args['branch'] ], env: { "VVV_LOG" => "utility-source-#{name}" }
-  end
 
   vvv_config['utilities'].each do |name, utilities|
     utilities = {} unless utilities.is_a? Array

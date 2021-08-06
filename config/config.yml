@@ -67,15 +67,10 @@ sites:
 utilities:
   core:
     - memcached-admin
-    - nvm
     - opcache-gui
-    - opcache-status
     - tls-ca
     - webgrind
-    # - tideways # https://varyingvagrantvagrants.org/docs/en-US/references/tideways-xhgui/
-    # - mongodb # needed for Tideways
-    # - wpcli-dev
-    - php # php56, php70, php71, php72, php73, php74, php80
+    - php74
 
 general:
   db_backup: true
