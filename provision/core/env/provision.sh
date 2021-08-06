@@ -99,13 +99,6 @@ function profile_setup() {
   rm -f /home/vagrant/.subversion/config
   noroot cp "/srv/provision/core/env/homedir/.subversion/subversion-config" "/home/vagrant/.subversion/config"
 
-  # If a bash_prompt file exists in the VVV config/ directory, copy to the VM.
-  if [[ -f "/srv/config/bash_prompt" ]]; then
-    vvv_info " * Copying /srv/config/bash_prompt to /home/vagrant/.bash_prompt"
-    rm -f /home/vagrant/.bash_prompt
-    noroot cp "/srv/config/bash_prompt" "/home/vagrant/.bash_prompt"
-  fi
-
   if [ -d "/etc/ssh" ]; then
     vvv_info " * Copying /srv/provision/core/env/ssh/ssh_known_hosts to /etc/ssh/ssh_known_hosts"
     cp -f /srv/provision/core/env/ssh/ssh_known_hosts /etc/ssh/ssh_known_hosts

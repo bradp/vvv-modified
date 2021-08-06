@@ -204,8 +204,6 @@ function vvv_provision_site_repo() {
         echo " * performing a hard reset on origin/${BRANCH}"
         noroot git reset "origin/${BRANCH}" --hard -q
         echo " * Updating provisioner repo complete"
-      else
-        vvv_error " * Problem! A site folder for ${SITE} was found at ${VM_DIR} that doesn't use a site template, but a site template is defined in the config file. Either the config file is mistaken, or a previous attempt to provision has failed, VVV will not try to git clone the site template to avoid data destruction, either remove the folder, or fix the config/config.yml entry${CRESET}"
       fi
     else
       # Clone or pull the site repository

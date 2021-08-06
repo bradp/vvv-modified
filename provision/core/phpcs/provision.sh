@@ -20,10 +20,10 @@ function php_codesniff_setup() {
   cd /srv/www/phpcs
   COMPOSER_BIN_DIR="bin" noroot composer update --no-ansi --no-progress -q 1> /dev/null
 
-  vvv_info " * Setting WordPress-Core as the default PHPCodesniffer standard"
+  vvv_info " * Setting Parbs as the default PHPCodesniffer standard"
 
   # Install the standards in PHPCS
-  noroot /srv/www/phpcs/bin/phpcs --config-set default_standard WordPress-Core 1> /dev/null
+  noroot /srv/www/phpcs/bin/phpcs --config-set default_standard Parbs 1> /dev/null
   vvv_success " * PHPCS provisioning has ended"
 }
 export -f php_codesniff_setup

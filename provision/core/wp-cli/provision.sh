@@ -13,6 +13,8 @@ function wp_cli_setup() {
     rm -f /usr/local/bin/wp
   fi
 
+  return
+
   if [[ ! -f "/usr/local/bin/wp" ]]; then
     vvv_info " * Downloading wp-cli nightly, see <url>http://wp-cli.org</url>"
     curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli-nightly.phar
@@ -32,7 +34,7 @@ function wp_cli_setup() {
     chown vagrant /usr/local/bin/wp
     chmod +x /usr/local/bin/wp
     vvv_info " * Updating wp-cli..."
-    noroot wp cli update --nightly --yes 1> /dev/null
+    noroot wp cli update --nightly --yes
     vvv_success " * WP CLI Nightly updated"
   fi
 
@@ -45,7 +47,7 @@ function wp_cli_setup() {
     xdebug_off
 
     vvv_info " * Updating WP packages"
-    noroot wp package update 1> /dev/null
+    noroot wp package update
     vvv_info " * WP package updates completed"
   fi
 }

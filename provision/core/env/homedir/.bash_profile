@@ -5,15 +5,7 @@
 # turn loads the .bash_aliases file that we provide. Use this
 # bash_profile to set environment variables and such.
 
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-        . "$HOME/.bashrc"
-    fi
-fi
-
-export PATH="$PATH:/srv/www/phpcs/bin"
+export PATH="$PATH:/srv/www/phpcs/vendor/bin"
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -27,11 +19,3 @@ white="\[\033[00m\]"
 PS1="${debian_chroot:+($debian_chroot)}${red}\u${green}@${blue}\h${white}:${yellow}\w$ \[\033[0m\]"
 
 cd "/srv/www"
-
-# setup bash prompt
-if [ -n "$BASH_VERSION" ]; then
-    # include .bash_prompt if it exists
-    if [ -f "$HOME/.bash_prompt" ]; then
-        . "$HOME/.bash_prompt"
-    fi
-fi

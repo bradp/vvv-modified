@@ -26,9 +26,8 @@ elif [ -d "/srv/www/wordpress-develop/public_html/src/" ]; then
     export WP_CORE_DIR=/srv/www/wordpress-develop/public_html/src/
 fi
 
-# PHPCS path
-if [[ $PATH != *"/srv/www/phpcs/scripts"* ]]; then
-	export PATH="$PATH:/srv/www/phpcs/scripts"
+if [[ $PATH != *"/srv/www/phpcs/vendor/bin"* ]]; then
+	export PATH="$PATH:/srv/www/phpcs/vendor/bin"
 fi
 
 # Ruby Gems
@@ -42,14 +41,3 @@ fi
 if [[ $PATH != *"/srv/config/homebin"* ]]; then
 	export PATH="$PATH:/srv/config/homebin"
 fi
-
-if [ -n "$BASH" ]; then
-	# add autocomplete for grunt
-	[ ! type "grunt" > /dev/null 2>&1 ] && eval "$(grunt --completion=bash)"
-
-	# add autocomplete for wp-cli
-	[ -s "/srv/config/wp-cli/wp-completion.bash" ] && . /srv/config/wp-cli/wp-completion.bash
-fi
-
-
-alias "x"="ls -las"

@@ -32,6 +32,8 @@ echo $(date "+%Y.%m.%d_%H-%M-%S") > /vagrant/provisioned_at
 cp -f /home/vagrant/version /vagrant
 cp -f /srv/config/config.yml /vagrant
 
+rm -f /home/vagrant/version
+
 chmod 0644 /vagrant/config.yml
 chmod 0644 /vagrant/version
 chmod 0644 /vagrant/provisioned_at
