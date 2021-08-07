@@ -4,8 +4,8 @@ database/data/*
 database/backups/*
 log/nginx/*
 log/php/*
-log/*.log
-provision/_phpcs
+log/provision/*
+provision/composerbin
 www/*
 !www/default/index.php
 *.sql

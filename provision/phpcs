@@ -8,8 +8,8 @@ function php_codesniff_setup() {
 
   vvv_info " * Provisioning PHP_CodeSniffer"
 
-  noroot mkdir -p /srv/provision/_phpcs
-  tee /srv/provision/_phpcs/composer.json <<EOF > /dev/null
+  noroot mkdir -p /srv/provision/composerbin
+  tee /srv/provision/composerbin/composer.json <<EOF > /dev/null
 {
   "name": "bradp/vvv-modified-composer",
   "type": "metapackage",
@@ -30,11 +30,11 @@ function php_codesniff_setup() {
 }
 EOF
 
-  cd /srv/provision/_phpcs
+  cd /srv/provision/composerbin
   COMPOSER_BIN_DIR="bin" noroot composer update --no-ansi --no-progress -q 1> /dev/null
 
   vvv_info " * Setting Parbs as the default PHPCodesniffer standard"
-  noroot /srv/provision/_phpcs/bin/phpcs --config-set default_standard Parbs 1> /dev/null
+  noroot /srv/provision/composerbin/bin/phpcs --config-set default_standard Parbs 1> /dev/null
 
   vvv_success " * PHPCS provisioning has ended"
 }

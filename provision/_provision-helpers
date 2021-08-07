@@ -74,7 +74,7 @@ function check_network_connection_to_host() {
   if [[ "$(wget --tries=3 --timeout=10 "${url}" -O /dev/null 2>&1 | grep 'connected')" ]]; then
     return 0
   fi
-  vvv_error " * Network connection issues found. Unable to reach <url>${url}</url>"
+  vvv_error " * Network connection issues found. Unable to reach ${url}"
   return 1
 }
 export -f check_network_connection_to_host

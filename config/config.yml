@@ -58,3 +58,11 @@ sites:
         WP_DEBUG: true
         WP_DISABLE_FATAL_ERROR_HANDLER: false
         WP_SCRIPT_DEBUG: true
+
+utilities:
+  core:
+    - memcached-admin
+    - opcache-gui
+    - tls-ca
+    - webgrind
+    - php74
