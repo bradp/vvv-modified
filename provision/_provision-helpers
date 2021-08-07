@@ -126,20 +126,20 @@ export -f network_check
 #
 # @arg $1 string name of the provisioner
 function log_to_file() {
-  rm -f /var/log/provision.log
-	touch /var/log/provision.log
+  rm -f /var/log/provision/provision.log
+	touch /var/log/provision/provision.log
 
 	# reset output otherwise it will log to previous files. from backup made in provisioners.sh
 	exec 1>&6
 	exec 2>&7
 	# pipe to file
 	if [[ "${1}" == "provisioner-main" ]]; then
-		exec > >( tee -a /var/log/provisioner.log ) # main provisioner outputs everything
+		exec > >( tee -a /var/log/provision/provision.log ) # main provisioner outputs everything
 	else
-		exec > >( tee -a "/var/log/provisioner.log" >/dev/null ) # others, only stderr
+		exec > >( tee -a "/var/log/provision/provision.log" >/dev/null ) # others, only stderr
 	fi
-	exec 2> >( tee -a "/var/log/provisioner.log" >&2 )
-	VVV_CURRENT_LOG_FILE="/var/log/provisioner.log"
+	exec 2> >( tee -a "/var/log/provision/provision.log" >&2 )
+	VVV_CURRENT_LOG_FILE="/var/log/provision/provision.log"
 }
 export -f log_to_file
 

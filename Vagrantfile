@@ -129,7 +129,7 @@ Vagrant.configure('2') do |config|
   config.vm.synced_folder 'certificates/', '/srv/certificates', create: true
   config.vm.synced_folder 'log/nginx', '/var/log/nginx', owner: 'root', create: true, group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
   config.vm.synced_folder 'log/php', '/var/log/php', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
-  config.vm.synced_folder 'log/provision.log', '/var/log/provision.log', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+  config.vm.synced_folder 'log/provision', '/var/log/provision', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
 
   config.vm.synced_folder 'www/', '/srv/www', owner: 'vagrant', group: 'www-data', mount_options: ['dmode=775', 'fmode=774']
 
@@ -141,6 +141,14 @@ Vagrant.configure('2') do |config|
   end
 
   config.vm.provision 'default', type: 'shell', keep_color: true, path: File.join('provision', '_provision'), env: { "VVV_LOG" => "main" }
+
+  vvv_config['utilities'].each do |name, utilities|
+    utilities = {} unless utilities.is_a? Array
+    utilities.each do |utility|
+      config.vm.provision "utility-#{name}-#{utility}", type: 'shell', keep_color: true, path: File.join('provision', '_provision-utility'), args: [ name, utility ], env: { "VVV_LOG" => "utility-#{name}-#{utility}" }
+    end
+  end
+
 
   vvv_config['sites'].each do |site, args|
     next if args['skip_provisioning']
