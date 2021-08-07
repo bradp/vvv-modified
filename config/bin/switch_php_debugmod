@@ -2,7 +2,7 @@
 set -eo pipefail
 
 
-source /srv/provision/provision-helpers.sh
+source /srv/provision/_provision-helpers
 
 # Grab the currently active PHP mods, and lowercase it for comparison
 enabled_mods=$(php -m)

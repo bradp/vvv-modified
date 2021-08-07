@@ -1,9 +1,7 @@
 ---
-
 sites:
   sandbox:
     # skip_provisioning: true
-    skip_provisioning: false
     description: "Sandbox"
     repo: https://github.com/bradp/vvv-wp.git
     hosts:
@@ -11,7 +9,6 @@ sites:
 
   testing:
     skip_provisioning: true
-    # skip_provisioning: false
     description: "Just some testing"
     repo: https://github.com/bradp/vvv-wp.git
     hosts:
@@ -19,7 +16,6 @@ sites:
 
   wp-core:
     skip_provisioning: true
-    # skip_provisioning: false
     description: "WordPress Core Development"
     repo: https://github.com/Varying-Vagrant-Vagrants/custom-site-template-develop.git
     hosts:
@@ -40,7 +36,6 @@ sites:
 
   wp-meta:
     skip_provisioning: true
-    # skip_provisioning: false
     description: "WordPress Meta"
     repo: https://github.com/WordPress/meta-environment.git
     hosts:
@@ -63,8 +58,3 @@ sites:
         WP_DEBUG: true
         WP_DISABLE_FATAL_ERROR_HANDLER: false
         WP_SCRIPT_DEBUG: true
-
-general:
-  db_backup: true
-  db_restore: true
-  db_share_type: false

@@ -32,24 +32,19 @@ function vvv_register_packages() {
   if [ -f "${APTSOURCE}" ]; then
     cp -f "${APTSOURCE}" "/etc/apt/sources.list.d/vvv-sources.list"
   else
-    vvv_error " ! VVV could not copy an Apt source file ( ${APTSOURCE} ), the current OS/Version (${OSID,,}-${OSCODENAME,,}) combination is unavailable"
+    vvv_error "VVV could not copy an Apt source file ( ${APTSOURCE} ), the current OS/Version (${OSID,,}-${OSCODENAME,,}) combination is unavailable"
   fi
 
   vvv_add_keys
 
   VVV_PACKAGE_REMOVAL_LIST+=(
-    # remove the old Python 2 packages to avoid issues with python3-pip
     python-pip
     python-setuptools
-
-    # remove mysql-common to ensure mariadb installation works
     mysql-common
   )
 
   VVV_PACKAGE_LIST+=(
     software-properties-common
-
-    # other packages that come in handy
     subversion
     zip
     unzip
@@ -61,20 +56,10 @@ function vvv_register_packages() {
     python3-pip
     python3-setuptools
     lftp
-
-    # ntp service to keep clock current
     ntp
     ntpdate
-
-    # Required for i18n tools
     gettext
-
-    # dos2unix
-    # Allows conversion of DOS style line endings to something less troublesome
-    # in Linux.
     dos2unix
-
-    # webp support
     libwebp-dev
     webp
   )
@@ -103,17 +88,11 @@ function cleanup_vvv(){
   sed -n '/# vvv-auto$/!p' /etc/hosts > /tmp/hosts
   echo "127.0.0.1 vvv # vvv-auto" >> "/etc/hosts"
   echo "127.0.0.1 vvv.test # vvv-auto" >> "/etc/hosts"
-  if is_utility_installed core tideways; then
-    echo "127.0.0.1 tideways.vvv.test # vvv-auto" >> "/etc/hosts"
-    echo "127.0.0.1 xhgui.vvv.test # vvv-auto" >> "/etc/hosts"
-  fi
   mv /tmp/hosts /etc/hosts
 }
 export -f cleanup_vvv
 
-if [ "${VVV_DOCKER}" != 1 ]; then
-  vvv_add_hook finalize cleanup_vvv 15
-fi
+vvv_add_hook finalize cleanup_vvv 15
 
 function apt_hash_missmatch_fix() {
   if [ ! -f "/etc/apt/apt.conf.d/99hashmismatch" ]; then

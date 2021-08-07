@@ -8,7 +8,7 @@
 # all trigger actions should be handled by this custom script. If
 # it does not exist, then we'll handle some basic tasks.
 set -eo pipefail
-source /srv/provision/provision-helpers.sh
+source /srv/provision/_provision-helpers
 
 sudo service nginx restart
 sudo service mysql restart

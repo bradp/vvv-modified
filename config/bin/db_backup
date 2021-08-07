@@ -7,7 +7,7 @@ set -eo pipefail
 
 trap 'rm -rf $TMPFIFODIR' EXIT; TMPFIFODIR=$(mktemp -d); mkfifo $TMPFIFODIR/dbnames
 
-source /srv/provision/provision-helpers.sh
+source /srv/provision/_provision-helpers
 
 mkdir -p /srv/database/backups
 vvv_info " * Performing Database Backups"

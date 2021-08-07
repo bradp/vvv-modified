@@ -4,20 +4,16 @@
 
 
 if [ -x "$(command -v ntpdate)" ]; then
-	echo " * Syncing clocks"
+  echo -e "\033[39m\033[2m * Syncing clocks\033[0m"
+
 	sudo ntpdate -u ntp.ubuntu.com 1> /dev/null
 fi
 
 rm -rf /vagrant/failed_provisioners
-rm -f /vagrant/version
 rm -f /vagrant/config.yml
 
 mkdir -p /vagrant
 mkdir -p /vagrant/failed_provisioners
-
-cp -f /home/vagrant/version /vagrant/version
-chmod 0644 /vagrant/version
-rm -f /home/vagrant/version
 
 cp -f /srv/config/config.yml /vagrant/config.yml && chmod 0644 /vagrant/config.yml
 chown -R vagrant:vagrant /vagrant

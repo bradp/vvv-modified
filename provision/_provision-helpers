@@ -64,7 +64,7 @@ export -f network_detection
 # @exitcode 1 If network issues are found
 function check_network_connection_to_host() {
   local url=${1:-"http://ppa.launchpad.net"}
-  vvv_info " * Testing network connection to <url>${url}</url>"
+  vvv_info " * Testing network connection to ${url}"
 
   # Network Detection
   #
@@ -126,7 +126,7 @@ export -f network_check
 #
 # @arg $1 string name of the provisioner
 function log_to_file() {
-	local logfile="/var/log/provisioners/${1}.log"
+	local logfile="/var/log/provisioner.log"
 	echo "" > "${logfile}"
 	# reset output otherwise it will log to previous files. from backup made in provisioners.sh
 	exec 1>&6

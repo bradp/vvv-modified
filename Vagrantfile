@@ -7,22 +7,6 @@ require 'yaml'
 require 'fileutils'
 
 vagrant_dir = __dir__
-branch_c = "\033[38;5;6m" # 111m"
-red = "\033[38;5;9m" # 124m"
-green = "\033[1;38;5;2m" # 22m"
-blue = "\033[38;5;4m" # 33m"
-purple = "\033[38;5;5m" # 129m"
-docs = "\033[0m"
-yellow = "\033[38;5;3m" # 136m"
-yellow_underlined = "\033[4;38;5;3m" # 136m"
-url = yellow_underlined
-creset = "\033[0m"
-
-version = '?'
-File.open("#{vagrant_dir}/config/.version", 'r') do |f|
-  version = f.read
-  version = version.gsub("\n", '')
-end
 
 vvv_config_file = File.join(vagrant_dir, 'config/config.yml')
 
@@ -31,10 +15,10 @@ begin
   unless vvv_config['sites'].is_a? Hash
     vvv_config['sites'] = {}
 
-    puts "#{red}config/config.yml is missing a sites section.#{creset}\n\n"
+    puts "\033[38;5;9mconfig/config.yml is missing a sites section.\033[0m\n\n"
   end
 rescue StandardError => e
-  puts "#{red}config/config.yml isn't a valid YAML file.#{creset}\n\n"
+  puts "\033[38;5;9mconfig/config.yml isn't a valid YAML file.\033[0m\n\n"
   warn e.message
   exit
 end
@@ -77,28 +61,6 @@ vvv_config['sites'].each do |site, args|
   vvv_config['sites'][site].delete('hosts')
 end
 
-if vvv_config['utility-sources'].is_a? Hash
-  vvv_config['utility-sources'].each do |name, args|
-    next unless args.is_a? String
-
-    repo = args
-    args = {}
-    args['repo'] = repo
-    args['branch'] = 'master'
-
-    vvv_config['utility-sources'][name] = args
-  end
-else
-  vvv_config['utility-sources'] = {}
-end
-
-unless vvv_config['utility-sources'].key?('core')
-  vvv_config['utility-sources']['core'] = {}
-  vvv_config['utility-sources']['core']['repo'] = 'https://github.com/Varying-Vagrant-Vagrants/vvv-utilities.git'
-  vvv_config['utility-sources']['core']['branch'] = 'master'
-end
-
-vvv_config['utilities'] = {} unless vvv_config['utilities'].is_a? Hash
 vvv_config['vm_config'] = {} unless vvv_config['vm_config'].is_a? Hash
 vvv_config['general'] = {} unless vvv_config['general'].is_a? Hash
 
@@ -113,19 +75,9 @@ vvv_config['vagrant-plugins'] = {} unless vvv_config['vagrant-plugins']
 
 $vvv_config = vvv_config
 
-if defined? vvv_config['vm_config']['provider']
-  # Override or set the vagrant provider.
-  ENV['VAGRANT_DEFAULT_PROVIDER'] = vvv_config['vm_config']['provider']
-end
-
 ENV['LC_ALL'] = 'en_US.UTF-8'
 
 Vagrant.configure('2') do |config|
-  # Store the current version of Vagrant for use in conditionals when dealing
-  # with possible backward compatible issues.
-  vagrant_version = Vagrant::VERSION.sub(/^v/, '')
-
-  # Configurations from 1.0.x can be placed in Vagrant 1.1.x specs like the following.
   config.vm.provider :virtualbox do |v|
     v.customize ['modifyvm', :id, '--uartmode1', 'file', File.join(vagrant_dir, 'log/ubuntu-cloudimg-console.log')]
     v.customize ['modifyvm', :id, '--memory', vvv_config['vm_config']['memory']]
@@ -147,7 +99,6 @@ Vagrant.configure('2') do |config|
     if File.file?(File.join(vagrant_dir, 'vagrant-goodhosts.gem'))
       system('vagrant plugin install ' + File.join(vagrant_dir, 'vagrant-goodhosts.gem'))
       File.delete(File.join(vagrant_dir, 'vagrant-goodhosts.gem'))
-      puts "#{yellow}VVV needed to install the vagrant-goodhosts plugin which is now installed. Please run the requested command again.#{creset}"
       exit
     else
       config.vagrant.plugins = ['vagrant-goodhosts']
@@ -170,7 +121,6 @@ Vagrant.configure('2') do |config|
 
   config.vm.network :private_network, id: 'vvv_primary', ip: vvv_config['vm_config']['private_network_ip']
   config.vm.synced_folder '.', '/vagrant', disabled: true
-  config.vm.provision 'file', source: "#{vagrant_dir}/config/.version", destination: '/home/vagrant/version'
   config.vm.synced_folder 'database/sql/', '/srv/database'
   use_db_share = false
   config.vm.synced_folder 'config/', '/srv/config'
