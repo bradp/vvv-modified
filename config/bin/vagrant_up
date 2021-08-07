@@ -17,4 +17,6 @@ if [ -x "$(command -v ntpdate)" ]; then
 	sudo ntpdate -u ntp.ubuntu.com 1> /dev/null
 fi
 
-show_site_urls
+echo -e " "
+echo -e "\033[01;32mvvv dashboard: \033[4;38;5;3mhttp://vvv.test\033[0m"
+echo -e " "

@@ -533,14 +533,22 @@ vvv_apt_package_remove() {
 }
 export -f vvv_apt_package_remove
 
-show_site_urls() {
-  RED="\033[38;5;9m"
-  GREEN="\033[01;32m"
-  CRESET="\033[0m"
+provision_utility() {
+	PROVISIONER="/srv/provision/${1}"
 
-  URL="\033[4;38;5;3m"
+	if [[ -f $PROVISIONER ]]; then
+		( bash "${PROVISIONER}" >> "${VVV_CURRENT_LOG_FILE}" )
+		SUCCESS=$?
+		if [ "${SUCCESS}" -eq 0 ]; then
+			provisioner_success
+			exit 0
+		else
+			exit 1
+		fi
+	else
+		vvv_error " * VVV Tried to run the utility provisioner for '${1}' but ${PROVISIONER} doesn't exist."
+		exit 1
+	fi
 
-  echo -e " "
-  echo -e "${GREEN}vvv dashboard: ${URL}http://vvv.test${CRESET}"
-  echo -e " "
+	provisioner_success
 }

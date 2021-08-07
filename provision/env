@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-# @description Adds the homebin folder to PATH
+# @description Adds the bin folder to PATH
 # @noargs
 function setup_vvv_env() {
   # fix no tty warnings in provisioner logs
   sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile
 
-  # add homebin to secure_path setting for sudo, clean first and then append at the end
+  # add bin to secure_path setting for sudo, clean first and then append at the end
   sed -i -E \
-    -e "s|:/srv/config/homebin||" \
-    -e "s|/srv/config/homebin:||" \
-    -e "s|(.*Defaults.*secure_path.*?\".*?)(\")|\1:/srv/config/homebin\2|" \
+    -e "s|:/srv/config/bin||" \
+    -e "s|/srv/config/bin:||" \
+    -e "s|(.*Defaults.*secure_path.*?\".*?)(\")|\1:/srv/config/bin\2|" \
     /etc/sudoers
 
-  # add homebin to the default environment, clean first and then append at the end
+  # add bin to the default environment, clean first and then append at the end
   sed -i -E \
-    -e "s|:/srv/config/homebin||" \
-    -e "s|/srv/config/homebin:||" \
-    -e "s|(.*PATH.*?\".*?)(\")|\1:/srv/config/homebin\2|" \
+    -e "s|:/srv/config/bin||" \
+    -e "s|/srv/config/bin:||" \
+    -e "s|(.*PATH.*?\".*?)(\")|\1:/srv/config/bin\2|" \
     /etc/environment
 }
 
@@ -60,8 +60,8 @@ function profile_setup() {
   if [ -d "/etc/ssh" ]; then
     vvv_info " * Copying /srv/provision/_config/ssh_known_hosts to /etc/ssh/ssh_known_hosts"
     cp -f /srv/provision/_config/ssh_known_hosts /etc/ssh/ssh_known_hosts
-    vvv_info " * Copying /srv/provision/_config/ssh_config to /etc/ssh/sshd_config"
-    cp -f /srv/provision/_config/ssh_config /etc/ssh/sshd_config
+    vvv_info " * Copying /srv/provision/_config/sshd_config to /etc/ssh/sshd_config"
+    cp -f /srv/provision/_config/sshd_config /etc/ssh/sshd_config
     if [ "${VVV_DOCKER}" != 1 ]; then
       vvv_info " * Reloading SSH Daemon"
       systemctl reload ssh 1> /dev/null

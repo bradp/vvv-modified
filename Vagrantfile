@@ -190,23 +190,10 @@ Vagrant.configure('2') do |config|
 
   config.vm.provision 'default', type: 'shell', keep_color: true, path: File.join('provision', '_provision'), env: { "VVV_LOG" => "main" }
 
-  vvv_config['utilities'].each do |name, utilities|
-    utilities = {} unless utilities.is_a? Array
-    utilities.each do |utility|
-      if utility == 'tideways'
-        vvv_config['hosts'] += ['tideways.vvv.test']
-        vvv_config['hosts'] += ['xhgui.vvv.test']
-      end
-      config.vm.provision "utility-#{name}-#{utility}", type: 'shell', keep_color: true, path: File.join('provision', '_provision-utility'), args: [ name, utility ], env: { "VVV_LOG" => "utility-#{name}-#{utility}" }
-    end
-  end
-
   vvv_config['sites'].each do |site, args|
     next if args['skip_provisioning']
     config.vm.provision "site-#{site}", type: 'shell', keep_color: true, path: File.join('provision', '_provision-site'), args: [ site, args['repo'].to_s, args['branch'], args['vm_dir'], args['skip_provisioning'].to_s, args['nginx_upstream'] ], env: { "VVV_LOG" => "site-#{site}" }
   end
-
-  config.vm.provision "post-provision-script", type: 'shell', keep_color: true, path: File.join( 'config/homebin', 'vagrant_provision' ), env: { "VVV_LOG" => "post-provision-script" }
 
   if Vagrant.has_plugin?('vagrant-goodhosts')
     config.goodhosts.aliases = vvv_config['hosts']

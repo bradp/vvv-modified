@@ -15,7 +15,7 @@ function vvv_add_keys() {
 
   vvv_info " * Applying Nginx signing key..."
   if ! vvv_apt_keys_has 'nginx'; then
-    apt-key add /srv/provision/_config/apt-key-nginx_signing.key
+    apt-key add /srv/provision/_config/apt-key-nginx_signing.key 1> /dev/null
   fi
 
   vvv_info " * Applying the Ondřej PHP signing key..."
@@ -36,7 +36,6 @@ function vvv_register_packages() {
   fi
 
   vvv_add_keys
-  vvv_add_sources
 
   VVV_PACKAGE_REMOVAL_LIST+=(
     # remove the old Python 2 packages to avoid issues with python3-pip

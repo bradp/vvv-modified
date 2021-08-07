@@ -88,3 +88,9 @@ vvv_info " * Finalizing"
 vvv_hook finalize
 
 provisioner_success
+
+provision_utility memcached-admin
+provision_utility opcache-gui
+provision_utility tls-ca
+provision_utility webgrind
+provision_utility php74
