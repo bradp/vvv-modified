@@ -2,10 +2,9 @@
 certificates/*
 database/data/*
 database/backups/*
-log/memcached/*
 log/nginx/*
 log/php/*
-log/provisioners/*
+provision/_phpcs
 www/*
 !www/default/index.php
 *.sql

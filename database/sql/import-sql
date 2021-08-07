@@ -18,7 +18,7 @@
 #
 # Let's begin...
 
-source /srv/provision/provision-helpers.sh
+source /srv/provision/_provision-helpers
 
 VVV_CONFIG=/srv/config/default-config.yml
 if [[ -f /srv/config/config.yml ]]; then

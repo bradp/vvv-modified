@@ -114,7 +114,7 @@ function mysql_setup() {
 
   # Process each mysqldump SQL file in database/backups to import
   # an initial data set for MySQL.
-  "/srv/database/import-sql.sh"
+  "/srv/database/import-sql"
 }
 export -f mysql_setup
 

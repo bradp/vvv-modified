@@ -6,7 +6,7 @@ set -eo pipefail
 function composer_setup() {
   # Disable XDebug before any Composer provisioning.
   vvv_info " * Turning off XDebug to avoid Composer performance issues"
-  sh /srv/config/bin/xdebug_off
+  # bash /srv/config/bin/xdebug_off
 
   # COMPOSER
 
@@ -17,7 +17,7 @@ function composer_setup() {
   vvv_info " * Checking if Composer is installed"
   if ! command -v composer &> /dev/null; then
     vvv_info " * Installing Composer..."
-    $(curl -sS "https://getcomposer.org/installer" | php)
+    curl -sS "https://getcomposer.org/installer" | php
     chmod +x "composer.phar"
     chown -R vagrant:www-data /usr/local/bin
     mv "composer.phar" "/usr/local/bin/composer"

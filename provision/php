@@ -33,16 +33,8 @@ function php_register_packages() {
     "php${VVV_BASE_PHPVERSION}-soap"
     "php${VVV_BASE_PHPVERSION}-xml"
     "php${VVV_BASE_PHPVERSION}-zip"
-  )
-
-  # ImageMagick
-  VVV_PACKAGE_LIST+=(
     "php${VVV_BASE_PHPVERSION}-imagick"
     imagemagick
-  )
-
-  # Xdebug
-  VVV_PACKAGE_LIST+=(
     "php${VVV_BASE_PHPVERSION}-xdebug"
   )
 }

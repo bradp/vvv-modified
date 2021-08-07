@@ -20,7 +20,7 @@ logfile /var/log/memcached/memcached.log
 -u memcache
 -l 127.0.0.1,192.168.50.4
 EOF
-  cp -f "/srv/provision/memcached/memcached.conf" "/etc/memcached_default.conf"
+  cp -f "/etc/memcached.conf" "/etc/memcached_default.conf"
 }
 export -f vvv_memcached_setup
 vvv_add_hook after_packages vvv_memcached_setup 60

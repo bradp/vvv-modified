@@ -126,9 +126,7 @@ Vagrant.configure('2') do |config|
   config.vm.synced_folder 'config/', '/srv/config'
   config.vm.synced_folder 'provision/', '/srv/provision'
   config.vm.synced_folder 'certificates/', '/srv/certificates', create: true
-  config.vm.synced_folder 'log/nginx', '/var/log/nginx', owner: 'root', create: true, group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
-  config.vm.synced_folder 'log/php', '/var/log/php', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
-  config.vm.synced_folder 'log/provisioners', '/var/log/provisioners', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+  config.vm.synced_folder 'log', '/var/log', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
   config.vm.synced_folder 'www/', '/srv/www', owner: 'vagrant', group: 'www-data', mount_options: ['dmode=775', 'fmode=774']
 
   vvv_config['sites'].each do |site, args|
@@ -138,7 +136,7 @@ Vagrant.configure('2') do |config|
     end
   end
 
-  config.vm.provision 'default', type: 'shell', keep_color: true, path: File.join('provision', '_provision'), env: { "VVV_LOG" => "main" }
+  config.vm.provision 'v', type: 'shell', keep_color: true, path: File.join('provision', '_provision'), env: { "VVV_LOG" => "main" }
 
   vvv_config['sites'].each do |site, args|
     next if args['skip_provisioning']
@@ -159,32 +157,32 @@ Vagrant.configure('2') do |config|
 
   config.trigger.after :up do |trigger|
     trigger.name = 'VVV Post-Up'
-    trigger.run_remote = { inline: '/srv/config/homebin/vagrant_up' }
+    trigger.run_remote = { inline: '/srv/config/bin/vagrant_up' }
     trigger.on_error = :continue
   end
   config.trigger.before :reload do |trigger|
     trigger.name = 'VVV Pre-Reload'
-    trigger.run_remote = { inline: '/srv/config/homebin/vagrant_halt' }
+    trigger.run_remote = { inline: '/srv/config/bin/vagrant_halt' }
     trigger.on_error = :continue
   end
   config.trigger.after :reload do |trigger|
     trigger.name = 'VVV Post-Reload'
-    trigger.run_remote = { inline: '/srv/config/homebin/vagrant_up' }
+    trigger.run_remote = { inline: '/srv/config/bin/vagrant_up' }
     trigger.on_error = :continue
   end
   config.trigger.before :halt do |trigger|
     trigger.name = 'VVV Pre-Halt'
-    trigger.run_remote = { inline: '/srv/config/homebin/vagrant_halt' }
+    trigger.run_remote = { inline: '/srv/config/bin/vagrant_halt' }
     trigger.on_error = :continue
   end
   config.trigger.before :suspend do |trigger|
     trigger.name = 'VVV Pre-Suspend'
-    trigger.run_remote = { inline: '/srv/config/homebin/vagrant_suspend' }
+    trigger.run_remote = { inline: '/srv/config/bin/vagrant_suspend' }
     trigger.on_error = :continue
   end
   config.trigger.before :destroy do |trigger|
     trigger.name = 'VVV Pre-Destroy'
-    trigger.run_remote = { inline: '/srv/config/homebin/vagrant_destroy' }
+    trigger.run_remote = { inline: '/srv/config/bin/vagrant_destroy' }
     trigger.on_error = :continue
   end
 end
