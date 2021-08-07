@@ -15,7 +15,7 @@ rm -f /vagrant/config.yml
 mkdir -p /vagrant
 mkdir -p /vagrant/failed_provisioners
 
-cp -f /srv/config/config.yml /vagrant/config.yml && chmod 0644 /vagrant/config.yml
+cp -f /srv/config.yml /vagrant/config.yml && chmod 0644 /vagrant/config.yml
 chown -R vagrant:vagrant /vagrant
 
 export VVV_CONFIG=/vagrant/config.yml

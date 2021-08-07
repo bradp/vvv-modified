@@ -10,5 +10,5 @@ www/*
 !www/default/index.php
 *.sql
 *.sql.gz
-config/config.yml
+config.yml
 wp-cli.yml

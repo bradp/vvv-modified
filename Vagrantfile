@@ -7,16 +7,16 @@ require 'yaml'
 require 'fileutils'
 
 vagrant_dir = __dir__
-vvv_config_file = File.join(vagrant_dir, 'config/config.yml')
+vvv_config_file = File.join(vagrant_dir, 'config.yml')
 
 begin
   vvv_config = YAML.load_file(vvv_config_file)
   unless vvv_config['sites'].is_a? Hash
     vvv_config['sites'] = {}
-    puts "\033[38;5;9mconfig/config.yml is missing a sites section.\033[0m\n\n"
+    puts "\033[38;5;9mconfig.yml is missing a sites section.\033[0m\n\n"
   end
 rescue StandardError => e
-  puts "\033[38;5;9mconfig/config.yml isn't a valid YAML file.\033[0m\n\n"
+  puts "\033[38;5;9mconfig.yml isn't a valid YAML file.\033[0m\n\n"
   warn e.message
   exit
 end
