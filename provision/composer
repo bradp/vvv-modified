@@ -6,7 +6,7 @@ set -eo pipefail
 function composer_setup() {
   # Disable XDebug before any Composer provisioning.
   vvv_info " * Turning off XDebug to avoid Composer performance issues"
-  # bash /srv/config/bin/xdebug_off
+  sh /srv/config/bin/xdebug_off
 
   # COMPOSER
 

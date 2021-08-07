@@ -55,7 +55,7 @@ fi
 count=0
 for db in "${databases[@]}"
 do
-    OUTPUT=$(printf "<info>  - Backing up </info><b>%s</b>" "${db}")
+    OUTPUT=$(printf "<info> - Backing up </info><b>%s</b>" "${db}")
     vvv_output "${OUTPUT}"
     if [[ "${gzip}" == "True" ]]; then
       mysqldump -uroot -proot "${db}" | gzip > "/srv/database/backups/${db}.sql.gz"
@@ -65,4 +65,4 @@ do
     let "count=count+1"
 done
 
-vvv_success " * Finished backing up databases to the <b>database/sql/backups</b><success> folder</success>"
+vvv_success " * Finished backing up databases to the <b>database/backups</b><success> folder</success>"

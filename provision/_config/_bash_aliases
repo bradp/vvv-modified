@@ -27,12 +27,12 @@ elif [ -d "/srv/www/wordpress-develop/public_html/src/" ]; then
     export WP_CORE_DIR=/srv/www/wordpress-develop/public_html/src/
 fi
 
-if [[ $PATH != *"/srv/provision/composerbin/bin"* ]]; then
-	export PATH="$PATH:/srv/provision/composerbin/bin"
+if [[ $PATH != *"/srv/provision/bin/bin"* ]]; then
+	export PATH="$PATH:/srv/provision/bin/bin"
 fi
 
-if [[ $PATH != *"/srv/provision/composerbin/vendor/bin"* ]]; then
-	export PATH="$PATH:/srv/provision/composerbin/vendor/bin"
+if [[ $PATH != *"/srv/provision/bin/vendor/bin"* ]]; then
+	export PATH="$PATH:/srv/provision/bin/vendor/bin"
 fi
 
 # Ruby Gems

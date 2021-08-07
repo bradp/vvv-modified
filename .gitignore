@@ -5,7 +5,7 @@ database/backups/*
 log/nginx/*
 log/php/*
 log/provision/*
-provision/composerbin
+provision/bin
 www/*
 !www/default/index.php
 *.sql

@@ -7,14 +7,12 @@ require 'yaml'
 require 'fileutils'
 
 vagrant_dir = __dir__
-
 vvv_config_file = File.join(vagrant_dir, 'config/config.yml')
 
 begin
   vvv_config = YAML.load_file(vvv_config_file)
   unless vvv_config['sites'].is_a? Hash
     vvv_config['sites'] = {}
-
     puts "\033[38;5;9mconfig/config.yml is missing a sites section.\033[0m\n\n"
   end
 rescue StandardError => e
@@ -105,33 +103,24 @@ Vagrant.configure('2') do |config|
     end
   end
 
-  # The vbguest plugin has issues for some users, so we're going to disable it for now
   config.vbguest.auto_update = false if Vagrant.has_plugin?('vagrant-vbguest')
   config.ssh.forward_agent = true
   config.ssh.insert_key = false
   config.vm.box = 'bento/ubuntu-20.04'
   config.vm.box_check_update = false
   config.vm.hostname = 'vvv'
-
-  if !vvv_config['vagrant-plugins']['disksize'].nil? && defined?(Vagrant::Disksize)
-    config.vm.provider :virtualbox do |_v, override|
-      override.disksize.size = vvv_config['vagrant-plugins']['disksize']
-    end
-  end
-
   config.vm.network :private_network, id: 'vvv_primary', ip: vvv_config['vm_config']['private_network_ip']
-  config.vm.synced_folder '.', '/vagrant', disabled: true
-  config.vm.synced_folder 'database/sql/', '/srv/database'
   use_db_share = false
-  config.vm.synced_folder 'config/', '/srv/config'
-  config.vm.synced_folder 'provision/', '/srv/provision'
-  config.vm.synced_folder 'certificates/', '/srv/certificates', create: true
-  config.vm.synced_folder 'certificates/', '/srv/certificates', create: true
+
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+  config.vm.synced_folder 'database', '/srv/database'
+  config.vm.synced_folder 'config', '/srv/config'
+  config.vm.synced_folder 'provision', '/srv/provision'
+  config.vm.synced_folder 'certificates', '/srv/certificates', create: true
   config.vm.synced_folder 'log/nginx', '/var/log/nginx', owner: 'root', create: true, group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
   config.vm.synced_folder 'log/php', '/var/log/php', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
   config.vm.synced_folder 'log/provision', '/var/log/provision', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
-
-  config.vm.synced_folder 'www/', '/srv/www', owner: 'vagrant', group: 'www-data', mount_options: ['dmode=775', 'fmode=774']
+  config.vm.synced_folder 'www', '/srv/www', owner: 'vagrant', group: 'www-data', mount_options: ['dmode=775', 'fmode=774']
 
   vvv_config['sites'].each do |site, args|
     next if args['skip_provisioning']
@@ -148,7 +137,6 @@ Vagrant.configure('2') do |config|
       config.vm.provision "utility-#{name}-#{utility}", type: 'shell', keep_color: true, path: File.join('provision', '_provision-utility'), args: [ name, utility ], env: { "VVV_LOG" => "utility-#{name}-#{utility}" }
     end
   end
-
 
   vvv_config['sites'].each do |site, args|
     next if args['skip_provisioning']
