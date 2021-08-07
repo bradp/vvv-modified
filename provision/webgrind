@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Webgrind install (for viewing callgrind/cachegrind files produced by
+# xdebug profiler)
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+noroot() {
+  sudo -EH -u "vagrant" "$@";
+}
+
+# make sure the folder exists and is writable
+noroot mkdir -p /srv/www/.default/webgrind/
+cd /srv/www/.default/webgrind/
+
+# phpMyAdmin
+echo " * Installing/Updating webgrind, see https://github.com/jokkedk/webgrind ..."
+tee composer.json <<EOF > /dev/null
+{
+    "name": "vvv/webgrind",
+    "type": "project",
+    "require": {
+        "oomphinc/composer-installers-extender": "^1.1",
+        "jokkedk/webgrind": "*"
+    },
+    "extra": {
+        "installer-types": ["application"],
+        "installer-paths": {
+            "/srv/www/.default/webgrind/": ["jokkedk/webgrind"]
+        }
+    }
+}
+EOF
+noroot composer update --no-autoloader -q
+
+echo " * Finished webgrind provisioner"

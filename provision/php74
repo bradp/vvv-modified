@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+export DEBIAN_FRONTEND=noninteractive
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+apt_package_install_list=(
+  "php7.4-fpm"
+  "php7.4-cli"
+  "php7.4-common"
+  "php7.4-dev"
+  "php7.4-imagick"
+  "php7.4-memcache"
+  "php7.4-memcached"
+  "php7.4-pcov"
+  "php7.4-ssh2"
+  "php7.4-xdebug"
+  "php7.4-bcmath"
+  "php7.4-curl"
+  "php7.4-gd"
+  "php7.4-intl"
+  "php7.4-mbstring"
+  "php7.4-mysql"
+  "php7.4-imap"
+  "php7.4-json"
+  "php7.4-soap"
+  "php7.4-xml"
+  "php7.4-zip"
+)
+
+package_install() {
+  vvv_info " * Running apt-get update..."
+  apt-get -qq -y update1> /dev/null
+
+  vvv_info " * Installing apt-get packages..."
+  if ! apt-get -qq -y --allow-downgrades --allow-remove-essential --allow-change-held-packages -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew install --fix-missing --fix-broken ${apt_package_install_list[@]}; then
+    vvv_error " * Installing apt-get packages returned a failure code, cleaning up apt caches then exiting"
+    apt-get -qq clean 1> /dev/null
+    return 1
+  fi
+
+  vvv_info " * Removing unnecessary packages..."
+  apt-get -qq autoremove -y 1> /dev/null
+
+  vvv_info " * Cleaning apt caches..."
+  apt-get -qq clean 1> /dev/null
+
+  return 0
+}
+
+configure() {
+  cp -f "/srv/provision/_config/php7.4-upstream.conf" "/etc/nginx/upstreams/php74.conf"
+  vvv_info " * Copied /srv/provision/_config/php7.4-upstream.conf to /etc/nginx/upstreams/php74.conf"
+
+  cp -f "/srv/provision/_config/php7.4-fpm.conf" "/etc/php/7.4/fpm/php-fpm.conf"
+  vvv_info " * Copied /srv/provision/_config/php7.4-fpm.conf to /etc/php/7.4/fpm/php-fpm.conf"
+
+  cp -f "/srv/provision/_config/php7.4-www.conf" "/etc/php/7.4/fpm/pool.d/www.conf"
+  vvv_info " * Copied /srv/provision/_config/php7.4-www.conf to /etc/php/7.4/fpm/pool.d/www.conf"
+
+  cp -f "/srv/provision/_config/php7.4-custom.ini" "/etc/php/7.4/fpm/conf.d/php-custom.ini"
+  vvv_info " * Copied /srv/provision/_config/php7.4-custom.ini to /etc/php/7.4/fpm/conf.d/php-custom.ini"
+
+  cp -f "/srv/config/php-config/opcache.ini" "/etc/php/7.4/fpm/conf.d/opcache.ini"
+  vvv_info " * Copied /srv/config/php-config/opcache.ini to /etc/php/7.4/fpm/conf.d/opcache.ini"
+
+  cp -f "/srv/config/php-config/xdebug.ini" "/etc/php/7.4/mods-available/xdebug.ini"
+  vvv_info " * Copied /srv/config/php-config/xdebug.ini to /etc/php/7.4/mods-available/xdebug.ini"
+
+  if [[ -e /srv/config/php-config/mailcatcher.ini ]]; then
+    cp -f "/srv/config/php-config/mailcatcher.ini" "/etc/php/7.4/mods-available/mailcatcher.ini"
+    vvv_info " * Copied /srv/config/php-config/mailcatcher.ini to /etc/php/7.4/mods-available/mailcatcher.ini"
+
+  fi
+  if [[ -e /srv/config/php-config/mailhog.ini ]]; then
+    cp -f "/srv/config/php-config/mailhog.ini" "/etc/php/7.4/mods-available/mailhog.ini"
+    vvv_info " * Copied /srv/config/php-config/mailhog.ini to /etc/php/7.4/mods-available/mailhog.ini"
+  fi
+
+  vvv_info " * Restarting php7.4-fpm service "
+  service "php7.4-fpm" restart
+}
+
+package_install
+configure
+
+vvv_info " * Restoring the default PHP CLI version ( 7.4 )"
+update-alternatives --set php "/usr/bin/php7.4"
+update-alternatives --set phar "/usr/bin/phar7.4"
+update-alternatives --set phar.phar "/usr/bin/phar.phar7.4"
+update-alternatives --set phpize "/usr/bin/phpize7.4"
+update-alternatives --set php-config "/usr/bin/php-config7.4"
+
+vvv_info " * PHP 7.4 provisioning complete"

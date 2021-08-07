@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# @description PHP Codesniffer
+set -eo pipefail
+
+function php_codesniff_setup() {
+  export COMPOSER_ALLOW_SUPERUSER=1
+  export COMPOSER_NO_INTERACTION=1
+
+  vvv_info " * Provisioning PHP_CodeSniffer"
+
+  noroot mkdir -p /srv/provision/_phpcs
+  tee /srv/provision/_phpcs/composer.json <<EOF > /dev/null
+{
+  "name": "bradp/vvv-modified-composer",
+  "type": "metapackage",
+  "license": "MIT",
+  "require": {
+    "automattic/vipwpcs": "^2.2.0",
+    "squizlabs/php_codesniffer": "^3.6",
+    "phpcsstandards/phpcsextra": "^1.0.0-alpha3",
+    "phpcsstandards/phpcsutils": "^1.0.0-alpha3",
+    "phpcompatibility/phpcompatibility-wp": "^2.1",
+    "nunomaduro/phpinsights": "^1.14",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+    "phpcompatibility/php-compatibility": "^9.3",
+    "wp-cli/wp-cli-bundle": "^2.5.0",
+    "wp-coding-standards/wpcs": "^2.3",
+    "bradp/parbs-standards": "^0.0.1"
+  }
+}
+EOF
+
+  cd /srv/provision/_phpcs
+  COMPOSER_BIN_DIR="bin" noroot composer update --no-ansi --no-progress -q 1> /dev/null
+
+  vvv_info " * Setting Parbs as the default PHPCodesniffer standard"
+  noroot /srv/provision/_phpcs/bin/phpcs --config-set default_standard Parbs 1> /dev/null
+
+  vvv_success " * PHPCS provisioning has ended"
+}
+export -f php_codesniff_setup
+
+vvv_add_hook after_composer php_codesniff_setup

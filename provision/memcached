@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# @description Installs MemCached
+set -eo pipefail
+
+function vvv_memcached_register_packages() {
+  VVV_PACKAGE_LIST+=(memcached)
+}
+export -f vvv_memcached_register_packages
+vvv_add_hook before_packages vvv_memcached_register_packages
+
+function vvv_memcached_setup() {
+  # Copy memcached configuration from local
+  vvv_info " * Writing /srv/utilities/memcached/memcached.conf"
+  tee /etc/memcached.conf <<EOF > /dev/null
+# memcached.conf
+-d
+logfile /var/log/memcached/memcached.log
+-m 128
+-p 11211
+-u memcache
+-l 127.0.0.1,192.168.50.4
+EOF
+  cp -f "/srv/provision/memcached/memcached.conf" "/etc/memcached_default.conf"
+}
+export -f vvv_memcached_setup
+vvv_add_hook after_packages vvv_memcached_setup 60
+
+if [ "${VVV_DOCKER}" != 1 ]; then
+  vvv_add_hook services_restart "service memcached restart"
+fi
