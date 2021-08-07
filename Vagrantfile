@@ -126,7 +126,11 @@ Vagrant.configure('2') do |config|
   config.vm.synced_folder 'config/', '/srv/config'
   config.vm.synced_folder 'provision/', '/srv/provision'
   config.vm.synced_folder 'certificates/', '/srv/certificates', create: true
-  config.vm.synced_folder 'log', '/var/log', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+  config.vm.synced_folder 'certificates/', '/srv/certificates', create: true
+  config.vm.synced_folder 'log/nginx', '/var/log/nginx', owner: 'root', create: true, group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+  config.vm.synced_folder 'log/php', '/var/log/php', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+  config.vm.synced_folder 'log/provision.log', '/var/log/provision.log', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+
   config.vm.synced_folder 'www/', '/srv/www', owner: 'vagrant', group: 'www-data', mount_options: ['dmode=775', 'fmode=774']
 
   vvv_config['sites'].each do |site, args|
@@ -136,7 +140,7 @@ Vagrant.configure('2') do |config|
     end
   end
 
-  config.vm.provision 'v', type: 'shell', keep_color: true, path: File.join('provision', '_provision'), env: { "VVV_LOG" => "main" }
+  config.vm.provision 'default', type: 'shell', keep_color: true, path: File.join('provision', '_provision'), env: { "VVV_LOG" => "main" }
 
   vvv_config['sites'].each do |site, args|
     next if args['skip_provisioning']

@@ -126,8 +126,8 @@ export -f network_check
 #
 # @arg $1 string name of the provisioner
 function log_to_file() {
-  rm -f /var/log/provisioner.log
-	touch /var/log/provisioner.log
+  rm -f /var/log/provision.log
+	touch /var/log/provision.log
 
 	# reset output otherwise it will log to previous files. from backup made in provisioners.sh
 	exec 1>&6
@@ -553,3 +553,4 @@ provision_utility() {
 
 	provisioner_success
 }
+export -f provision_utility
