@@ -1,0 +1,22 @@
+---
+sites:
+  sandbox:
+    # skip_provisioning: true
+    description: "Sandbox"
+    repo: https://github.com/bradp/vvv-wp.git
+    hosts:
+      - sandbox.test
+
+  testing:
+    # skip_provisioning: true
+    description: "Just some testing"
+    hosts:
+      - testing.test
+
+utilities:
+  core:
+    - memcached-admin
+    - opcache-gui
+    - tls-ca
+    - webgrind
+    - php74

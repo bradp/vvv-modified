@@ -1,5 +1,0 @@
-@sandbox:
-    ssh: vagrant@vvv.test
-    path: /srv/www/sandbox
-    url: sandbox.test
-    user: admin

@@ -7,7 +7,7 @@ require 'yaml'
 require 'fileutils'
 
 vagrant_dir = __dir__
-vvv_config_file = File.join(vagrant_dir, 'config.yml')
+vvv_config_file = File.join(vagrant_dir, '.config/config.yml')
 
 begin
   vvv_config = YAML.load_file(vvv_config_file)
@@ -113,13 +113,13 @@ Vagrant.configure('2') do |config|
   use_db_share = false
 
   config.vm.synced_folder '.', '/vagrant', disabled: true
-  config.vm.synced_folder 'database', '/srv/database'
-  config.vm.synced_folder 'config', '/srv/config'
-  config.vm.synced_folder 'provision', '/srv/provision'
-  config.vm.synced_folder 'certificates', '/srv/certificates', create: true
-  config.vm.synced_folder 'log/nginx', '/var/log/nginx', owner: 'root', create: true, group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
-  config.vm.synced_folder 'log/php', '/var/log/php', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
-  config.vm.synced_folder 'log/provision', '/var/log/provision', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+  config.vm.synced_folder '.database', '/srv/database'
+  config.vm.synced_folder '.config', '/srv/config'
+  config.vm.synced_folder '.provision', '/srv/provision'
+  config.vm.synced_folder '.certificates', '/srv/certificates', create: true
+  config.vm.synced_folder '.log/nginx', '/var/log/nginx', owner: 'root', create: true, group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+  config.vm.synced_folder '.log/php', '/var/log/php', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
+  config.vm.synced_folder '.log/provision', '/var/log/provision', create: true, owner: 'root', group: 'syslog', mount_options: ['dmode=777', 'fmode=666']
   config.vm.synced_folder 'www', '/srv/www', owner: 'vagrant', group: 'www-data', mount_options: ['dmode=775', 'fmode=774']
 
   vvv_config['sites'].each do |site, args|
@@ -129,18 +129,18 @@ Vagrant.configure('2') do |config|
     end
   end
 
-  config.vm.provision 'default', type: 'shell', keep_color: true, path: File.join('provision', '_provision'), env: { "VVV_LOG" => "main" }
+  config.vm.provision 'default', type: 'shell', keep_color: true, path: File.join('.provision', '_provision'), env: { "VVV_LOG" => "main" }
 
   vvv_config['utilities'].each do |name, utilities|
     utilities = {} unless utilities.is_a? Array
     utilities.each do |utility|
-      config.vm.provision "utility-#{name}-#{utility}", type: 'shell', keep_color: true, path: File.join('provision', '_provision-utility'), args: [ name, utility ], env: { "VVV_LOG" => "utility-#{name}-#{utility}" }
+      config.vm.provision "utility-#{name}-#{utility}", type: 'shell', keep_color: true, path: File.join('.provision', '_provision-utility'), args: [ name, utility ], env: { "VVV_LOG" => "utility-#{name}-#{utility}" }
     end
   end
 
   vvv_config['sites'].each do |site, args|
     next if args['skip_provisioning']
-    config.vm.provision "site-#{site}", type: 'shell', keep_color: true, path: File.join('provision', '_provision-site'), args: [ site, args['repo'].to_s, args['branch'], args['vm_dir'], args['skip_provisioning'].to_s, args['nginx_upstream'] ], env: { "VVV_LOG" => "site-#{site}" }
+    config.vm.provision "site-#{site}", type: 'shell', keep_color: true, path: File.join('.provision', '_provision-site'), args: [ site, args['repo'].to_s, args['branch'], args['vm_dir'], args['skip_provisioning'].to_s, args['nginx_upstream'] ], env: { "VVV_LOG" => "site-#{site}" }
   end
 
   if Vagrant.has_plugin?('vagrant-goodhosts')
